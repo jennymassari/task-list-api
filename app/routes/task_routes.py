@@ -1,6 +1,7 @@
 from flask import Blueprint, abort, make_response, request, Response
 from app.models.task import Task
 from ..db import db
+from datetime import datetime
 
 
 tasks_bp = Blueprint("task_bp", __name__, url_prefix="/tasks")
@@ -56,12 +57,10 @@ def get_all_tasks():
 
     tasks = db.session.scalars(query)
     
-
     tasks_response = []
     for task in tasks:
         tasks_response.append(
-            {
-             
+            {             
                 "id": task.id,
                 "title": task.title,
                 "description": task.description,
@@ -118,6 +117,41 @@ def delete_task(task_id):
     db.session.commit()
 
     return {"details": f"Task {task_id} \"Go on my daily walk 🏞\" successfully deleted"}
+
+@tasks_bp.patch("/<task_id>/mark_complete")
+def task_mark_complete(task_id):
+    task = validate_task(task_id)
+    
+    task.completed_at = datetime.now()
+
+    db.session.commit()
+
+    return {
+                "task": {
+                    "id": task.id,
+                    "title": task.title,
+                    "description": task.description,
+                    "is_complete": check_complete(task.completed_at)
+                }
+            }
+
+@tasks_bp.patch("/<task_id>/mark_incomplete")
+def task_mark_incomplete(task_id):
+    task = validate_task(task_id)
+    
+    task.completed_at = None
+
+    db.session.commit()
+
+    return {
+                "task": {
+                    "id": task.id,
+                    "title": task.title,
+                    "description": task.description,
+                    "is_complete": check_complete(task.completed_at)
+                }
+            }
+
 
 def validate_task(task_id):
     try:
