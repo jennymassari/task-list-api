@@ -43,7 +43,18 @@ def get_all_tasks():
 
     query = db.select(Task)
 
-    tasks = db.session.scalars(query.order_by(Task.id))
+    title_param = request.args.get("title")
+    if title_param:
+        query = db.select(Task).where(Task.name == title_param)
+        
+    sort_param = request.args.get("sort")
+    if sort_param == "desc":
+        query = query.order_by(Task.title.desc())
+
+    else:
+        query = query.order_by(Task.title.asc())
+
+    tasks = db.session.scalars(query)
     
 
     tasks_response = []
