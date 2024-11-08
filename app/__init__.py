@@ -4,6 +4,7 @@ from .models import task, goal
 from .routes.task_routes import tasks_bp
 import os
 from dotenv import load_dotenv
+from .routes.goal_routes import goals_bp
 
 load_dotenv()
 SLACKBOT_TOKEN = os.environ.get("SLACKBOT_TOKEN")
@@ -24,6 +25,7 @@ def create_app(config=None):
 
     # Register Blueprints here
     app.register_blueprint(tasks_bp)
+    app.register_blueprint(goals_bp)
 
     
 
