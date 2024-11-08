@@ -82,14 +82,23 @@ def get_one_task(task_id):
     task = validate_model(Task, task_id)
     query = db.select(Task).where(Task.id == task_id)
     task = db.session.scalar(query)
-    return {
-                "task": {
-                    "id": task.id,
-                    "title": task.title,
-                    "description": task.description,
-                    "is_complete": check_complete(task.completed_at)
-                }
+
+    if task.goal_id:
+        return {
+                "task": task.to_dict()
+                
             }
+    else:
+        return {
+                    "task": {
+                        "id": task.id,
+                        "title": task.title,
+                        "description": task.description,
+                        "is_complete": check_complete(task.completed_at)
+                    }
+                }
+
+    
 
 @tasks_bp.put("/<task_id>")
 def update_task(task_id):
